@@ -1,4 +1,9 @@
+import 'package:ddobagi_app/screens/email.dart';
+import 'package:ddobagi_app/screens/guide.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,119 +12,251 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp, // 세로 정방향만 사용할 수 있다.
+      // DeviceOrientation.portraitDown,
+      // DeviceOrientation.landscapeLeft,
+      // DeviceOrientation.landscapeRight,
+    ]);
+
+    return ScreenUtilInit(
+      //screenutil 라이브러리 (뒤에 .h, .w00, .r, .sp등등 크기를 반응형으로 만들어줌)
+      designSize: const Size(375, 812), // 어떤 사이즈를 기준으로 만들것인가
+      builder: (BuildContext context, Widget? child) => const MaterialApp(
+          title: 'Hearing',
+          debugShowCheckedModeBanner: false,
+          home: const Login()),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class Login extends StatefulWidget {
+  const Login({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<Login> createState() => _LoginState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _LoginState extends State<Login> with WidgetsBindingObserver {
+  final _nameController = TextEditingController();
 
-  void _incrementCounter() {
+  bool keyboardVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // WidgetsBindingObserver 등록
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // WidgetsBindingObserver 해제
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bool newKeyboardVisible =
+        WidgetsBinding.instance.window.viewInsets.bottom > 0;
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      keyboardVisible = newKeyboardVisible;
+      print(keyboardVisible);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: null,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Center(
+              child: Column(
+                children: [
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 200.h, left: 25.w, bottom: 13.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Drawing",
+                          style: TextStyle(
+                              fontSize: 53.sp,
+                              color: const Color(0xffFFE147),
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          ".",
+                          style: TextStyle(
+                              fontSize: 53.sp,
+                              color: const Color(0xff4B9EFF),
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 25.w, bottom: 22.h),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          "당신만의 키트를 제작해보세요!",
+                          style: TextStyle(
+                              fontSize: 18.sp,
+                              color: Colors.black,
+                              fontFamily: 'pretendar'),
+                        )
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(left: 20.w, right: 20.w),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                        color: const Color(0xffE9E9EA),
+                      ),
+                      child: TextField(
+                        textAlign: TextAlign.start,
+                        textAlignVertical: TextAlignVertical.center,
+                        style: TextStyle(
+                            fontSize: 14.sp,
+                            color: const Color(0xff565656),
+                            fontFamily: 'pretender'),
+                        decoration: InputDecoration(
+                            hintText: '아이디를 입력해주세요.',
+                            hintStyle: TextStyle(
+                                fontSize: 14.sp,
+                                color: const Color(0xff565656).withOpacity(0.5),
+                                fontFamily: 'pretender'),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.only(
+                                left: 16.w, right: 0, top: 0, bottom: 0),
+                            suffixIcon: _nameController.text == ""
+                                ? IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {},
+                                    icon: const Icon(null))
+                                : IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      setState(() {});
+                                    },
+                                    icon: const Icon(Icons.cancel_outlined))),
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 20.w, right: 20.w, top: 13.h),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                        color: const Color(0xffE9E9EA),
+                      ),
+                      child: TextField(
+                        textAlign: TextAlign.start,
+                        obscureText: true,
+                        textAlignVertical: TextAlignVertical.center,
+                        style: TextStyle(
+                            fontSize: 14.sp,
+                            color: const Color(0xff565656),
+                            fontFamily: 'pretender'),
+                        decoration: InputDecoration(
+                            hintText: '비밀번호를 입력해주세요.',
+                            hintStyle: TextStyle(
+                                fontSize: 14.sp,
+                                color: const Color(0xff565656).withOpacity(0.5),
+                                fontFamily: 'pretender'),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.only(
+                                left: 16.w, right: 0, top: 0, bottom: 0),
+                            suffixIcon: _nameController.text == ""
+                                ? IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {},
+                                    icon: const Icon(null))
+                                : IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () {
+                                      setState(() {});
+                                    },
+                                    icon: const Icon(Icons.cancel_outlined))),
+                        onChanged: (value) {
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                        left: 20.w, right: 20.w, top: 29.h, bottom: 215.h),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (_) => const Guide()));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0.0,
+                        backgroundColor: const Color(0xffFFE147),
+                        minimumSize: Size(double.infinity, 53.h),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30.r)),
+                      ),
+                      child: Text(
+                        "로그인",
+                        style: TextStyle(
+                            fontSize: 23.sp,
+                            color: Colors.white,
+                            fontFamily: 'pretendar'),
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        CupertinoPageRoute(
+                          fullscreenDialog: true,
+                          builder: (context) {
+                            return const Email();
+                          },
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "회원이 아니신가요?",
+                      style: TextStyle(
+                          color: const Color(0xff128DFF),
+                          fontSize: 13.sp,
+                          fontFamily: 'pretendar',
+                          decoration: TextDecoration.underline,
+                          decorationThickness: 1.2.h),
+                    ),
+                  ),
+                  SizedBox(
+                    height: keyboardVisible == true ? 150.h : 0.h,
+                  )
+                ],
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
